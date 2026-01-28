@@ -4,10 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-const mockSimilarProjects = [
+const matchedProjects = [
   { name: "Smart Traffic Management System", match: 92 },
   { name: "Autonomous Drone Navigation", match: 87 },
   { name: "Predictive Maintenance System", match: 76 },
+];
+
+const noMatchProjects = [
+  { name: "No similar projects found", match: 0 },
 ];
 
 export const AIAssistancePanel = () => {
@@ -16,6 +20,7 @@ export const AIAssistancePanel = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [hasMatches, setHasMatches] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -62,6 +67,7 @@ export const AIAssistancePanel = () => {
     setIsAnalyzing(false);
     setAnalysisProgress(0);
     setAnalysisComplete(false);
+    setHasMatches(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -77,6 +83,8 @@ export const AIAssistancePanel = () => {
           if (newProgress >= 100) {
             setIsAnalyzing(false);
             setAnalysisComplete(true);
+            // Simulate match detection - 70% chance of finding matches
+            setHasMatches(Math.random() > 0.3);
           }
           return newProgress;
         });
@@ -169,45 +177,64 @@ export const AIAssistancePanel = () => {
             {/* Similar Projects Results */}
             {analysisComplete && (
               <div className="space-y-3 animate-fade-in-up">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-accent" />
-                  <span className="text-sm font-medium text-foreground">
-                    Highly Similar Projects Found
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {mockSimilarProjects.map((project, index) => (
-                    <div
-                      key={project.name}
-                      className="group flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer animate-fade-in-up"
-                      style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0 group-hover:text-accent transition-colors" />
-                        <span className="text-sm text-foreground truncate">
-                          {project.name}
-                        </span>
-                      </div>
-                      <Badge
-                        className={`ml-2 flex-shrink-0 ${
-                          project.match >= 90
-                            ? "bg-red-500/10 text-red-600 border-red-200"
-                            : project.match >= 80
-                            ? "bg-amber-500/10 text-amber-600 border-amber-200"
-                            : "bg-green-500/10 text-green-600 border-green-200"
-                        }`}
-                        variant="outline"
-                      >
-                        {project.match}% Match
-                      </Badge>
+                {hasMatches ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-accent" />
+                      <span className="text-sm font-medium text-foreground">
+                        Similar Projects Found
+                      </span>
                     </div>
-                  ))}
-                </div>
 
-                <p className="text-xs text-muted-foreground text-center pt-2">
-                  Click on a project to view comparison details
-                </p>
+                    <div className="space-y-2">
+                      {matchedProjects.map((project, index) => (
+                        <div
+                          key={project.name}
+                          className="group flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer animate-fade-in-up"
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0 group-hover:text-accent transition-colors" />
+                            <span className="text-sm text-foreground truncate">
+                              {project.name}
+                            </span>
+                          </div>
+                          <Badge
+                            className={`ml-2 flex-shrink-0 ${
+                              project.match >= 90
+                                ? "bg-red-500/10 text-red-600 border-red-200"
+                                : project.match >= 80
+                                ? "bg-amber-500/10 text-amber-600 border-amber-200"
+                                : "bg-green-500/10 text-green-600 border-green-200"
+                            }`}
+                            variant="outline"
+                          >
+                            {project.match}% Match
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-xs text-muted-foreground text-center pt-2">
+                      Click on a project to view comparison details
+                    </p>
+                  </>
+                ) : (
+                  <div className="text-center py-4 animate-fade-in-up">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500/10 flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-green-600" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground mb-1">
+                      No Similar Projects Found
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Your research appears to be unique in our database
+                    </p>
+                    <Badge className="mt-3 bg-green-500/10 text-green-600 border-green-200" variant="outline">
+                      Original Work
+                    </Badge>
+                  </div>
+                )}
               </div>
             )}
           </div>
