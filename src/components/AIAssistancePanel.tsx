@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Upload, FileText, ArrowRight, Sparkles, X, Loader2 } from "lucide-react";
+import { Upload, FileText, ArrowRight, X, Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -10,17 +10,13 @@ const matchedProjects = [
   { name: "Predictive Maintenance System", match: 76 },
 ];
 
-const noMatchProjects = [
-  { name: "No similar projects found", match: 0 },
-];
-
 export const AIAssistancePanel = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisComplete, setAnalysisComplete] = useState(false);
-  const [hasMatches, setHasMatches] = useState(false);
+  const [overallMatchPercent, setOverallMatchPercent] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -37,6 +33,7 @@ export const AIAssistancePanel = () => {
     setIsAnalyzing(true);
     setAnalysisProgress(0);
     setAnalysisComplete(false);
+    setOverallMatchPercent(0);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -67,7 +64,7 @@ export const AIAssistancePanel = () => {
     setIsAnalyzing(false);
     setAnalysisProgress(0);
     setAnalysisComplete(false);
-    setHasMatches(false);
+    setOverallMatchPercent(0);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -83,8 +80,10 @@ export const AIAssistancePanel = () => {
           if (newProgress >= 100) {
             setIsAnalyzing(false);
             setAnalysisComplete(true);
-            // Simulate match detection - 70% chance of finding matches
-            setHasMatches(Math.random() > 0.3);
+            // Simulate random match percentage (0-100)
+            // 30% chance of no match, 70% chance of some match
+            const hasMatch = Math.random() > 0.3;
+            setOverallMatchPercent(hasMatch ? Math.floor(Math.random() * 60) + 40 : Math.floor(Math.random() * 25));
           }
           return newProgress;
         });
@@ -93,12 +92,21 @@ export const AIAssistancePanel = () => {
     }
   }, [isAnalyzing, analysisProgress]);
 
+  const getMatchStatus = () => {
+    if (overallMatchPercent >= 70) return { status: "High Match", color: "text-red-600", bg: "bg-red-500/10", border: "border-red-200", icon: XCircle };
+    if (overallMatchPercent >= 40) return { status: "Partial Match", color: "text-amber-600", bg: "bg-amber-500/10", border: "border-amber-200", icon: AlertTriangle };
+    return { status: "No Match", color: "text-green-600", bg: "bg-green-500/10", border: "border-green-200", icon: CheckCircle };
+  };
+
+  const matchStatus = getMatchStatus();
+  const StatusIcon = matchStatus.icon;
+
   return (
     <Card className="sticky top-24 bg-card border-border shadow-md">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg text-foreground">
-          <Sparkles className="h-5 w-5 text-accent" />
-          AI Assistance
+          <FileText className="h-5 w-5 text-accent" />
+          AI Similarity Check
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -139,7 +147,7 @@ export const AIAssistancePanel = () => {
 
         {/* Uploaded File Info */}
         {uploadedFile && (
-          <div className="space-y-3 animate-fade-in-up">
+          <div className="space-y-4 animate-fade-in-up">
             <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
               <div className="flex items-center gap-2 min-w-0">
                 <FileText className="h-4 w-4 text-accent flex-shrink-0" />
@@ -174,15 +182,46 @@ export const AIAssistancePanel = () => {
               </div>
             )}
 
-            {/* Similar Projects Results */}
+            {/* Analysis Results */}
             {analysisComplete && (
-              <div className="space-y-3 animate-fade-in-up">
-                {hasMatches ? (
-                  <>
+              <div className="space-y-4 animate-fade-in-up">
+                {/* Overall Match Status Card */}
+                <div className={`p-4 rounded-lg ${matchStatus.bg} border ${matchStatus.border}`}>
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-accent" />
+                      <StatusIcon className={`h-5 w-5 ${matchStatus.color}`} />
+                      <span className={`text-sm font-semibold ${matchStatus.color}`}>
+                        {matchStatus.status}
+                      </span>
+                    </div>
+                    <Badge className={`${matchStatus.bg} ${matchStatus.color} ${matchStatus.border}`} variant="outline">
+                      {overallMatchPercent >= 40 ? "MATCHED" : "NOT MATCHED"}
+                    </Badge>
+                  </div>
+                  
+                  {/* Match Percentage Display */}
+                  <div className="text-center py-2">
+                    <div className={`text-4xl font-bold ${matchStatus.color}`}>
+                      {overallMatchPercent}%
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Overall Similarity Score
+                    </p>
+                  </div>
+
+                  <Progress 
+                    value={overallMatchPercent} 
+                    className={`h-2 mt-2 ${overallMatchPercent >= 70 ? '[&>div]:bg-red-500' : overallMatchPercent >= 40 ? '[&>div]:bg-amber-500' : '[&>div]:bg-green-500'}`} 
+                  />
+                </div>
+
+                {/* Matched Projects List */}
+                {overallMatchPercent >= 40 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
                       <span className="text-sm font-medium text-foreground">
-                        Similar Projects Found
+                        Matched With Projects:
                       </span>
                     </div>
 
@@ -209,7 +248,7 @@ export const AIAssistancePanel = () => {
                             }`}
                             variant="outline"
                           >
-                            {project.match}% Match
+                            {project.match}%
                           </Badge>
                         </div>
                       ))}
@@ -218,21 +257,18 @@ export const AIAssistancePanel = () => {
                     <p className="text-xs text-muted-foreground text-center pt-2">
                       Click on a project to view comparison details
                     </p>
-                  </>
-                ) : (
-                  <div className="text-center py-4 animate-fade-in-up">
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500/10 flex items-center justify-center">
-                      <Sparkles className="h-6 w-6 text-green-600" />
-                    </div>
-                    <p className="text-sm font-medium text-foreground mb-1">
-                      No Similar Projects Found
+                  </div>
+                )}
+
+                {/* No Match Message */}
+                {overallMatchPercent < 40 && (
+                  <div className="text-center py-2 animate-fade-in-up">
+                    <p className="text-sm font-medium text-green-600 mb-1">
+                      ✓ Your research appears to be original
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Your research appears to be unique in our database
+                      No significant matches found in our database
                     </p>
-                    <Badge className="mt-3 bg-green-500/10 text-green-600 border-green-200" variant="outline">
-                      Original Work
-                    </Badge>
                   </div>
                 )}
               </div>
@@ -242,7 +278,7 @@ export const AIAssistancePanel = () => {
 
         {!uploadedFile && (
           <p className="text-xs text-muted-foreground text-center">
-            Upload a document to find similar projects
+            Upload a document to check for similarity
           </p>
         )}
       </CardContent>
