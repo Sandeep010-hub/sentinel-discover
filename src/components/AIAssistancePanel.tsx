@@ -1,13 +1,57 @@
 import { useState, useRef, useEffect } from "react";
-import { Upload, FileText, ArrowRight, X, Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Upload, FileText, X, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-const matchedProjects = [
-  { name: "Smart Traffic Management System", match: 92 },
-  { name: "Autonomous Drone Navigation", match: 87 },
-  { name: "Predictive Maintenance System", match: 76 },
+type MatchScenario = {
+  type: "unique" | "unique_different_tech" | "completely_unique" | "exists";
+  abstract: "same" | "different" | "unique";
+  technology: "same" | "different" | "unique";
+  title: "same" | "different" | "unique";
+  badgeText: string;
+  matchedProject?: string;
+};
+
+const scenarios: MatchScenario[] = [
+  {
+    type: "unique",
+    abstract: "different",
+    technology: "same",
+    title: "same",
+    badgeText: "✅ Project is unique",
+    matchedProject: "Smart Traffic Management System",
+  },
+  {
+    type: "unique_different_tech",
+    abstract: "same",
+    technology: "different",
+    title: "same",
+    badgeText: "✅ Project is unique (Different technology approach)",
+    matchedProject: "Autonomous Drone Navigation",
+  },
+  {
+    type: "completely_unique",
+    abstract: "different",
+    technology: "different",
+    title: "different",
+    badgeText: "✅ Project is unique",
+  },
+  {
+    type: "exists",
+    abstract: "same",
+    technology: "same",
+    title: "same",
+    badgeText: "❌ Project already exists",
+    matchedProject: "Predictive Maintenance System",
+  },
+  {
+    type: "completely_unique",
+    abstract: "unique",
+    technology: "unique",
+    title: "unique",
+    badgeText: "✅ Project is unique",
+  },
 ];
 
 export const AIAssistancePanel = () => {
@@ -16,7 +60,7 @@ export const AIAssistancePanel = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisComplete, setAnalysisComplete] = useState(false);
-  const [overallMatchPercent, setOverallMatchPercent] = useState(0);
+  const [currentScenario, setCurrentScenario] = useState<MatchScenario | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -33,7 +77,7 @@ export const AIAssistancePanel = () => {
     setIsAnalyzing(true);
     setAnalysisProgress(0);
     setAnalysisComplete(false);
-    setOverallMatchPercent(0);
+    setCurrentScenario(null);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -64,7 +108,7 @@ export const AIAssistancePanel = () => {
     setIsAnalyzing(false);
     setAnalysisProgress(0);
     setAnalysisComplete(false);
-    setOverallMatchPercent(0);
+    setCurrentScenario(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -80,10 +124,9 @@ export const AIAssistancePanel = () => {
           if (newProgress >= 100) {
             setIsAnalyzing(false);
             setAnalysisComplete(true);
-            // Simulate random match percentage (0-100)
-            // 30% chance of no match, 70% chance of some match
-            const hasMatch = Math.random() > 0.3;
-            setOverallMatchPercent(hasMatch ? Math.floor(Math.random() * 60) + 40 : Math.floor(Math.random() * 25));
+            // Randomly pick a scenario
+            const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            setCurrentScenario(randomScenario);
           }
           return newProgress;
         });
@@ -92,14 +135,8 @@ export const AIAssistancePanel = () => {
     }
   }, [isAnalyzing, analysisProgress]);
 
-  const getMatchStatus = () => {
-    if (overallMatchPercent >= 70) return { status: "High Match", color: "text-red-600", bg: "bg-red-500/10", border: "border-red-200", icon: XCircle };
-    if (overallMatchPercent >= 40) return { status: "Partial Match", color: "text-amber-600", bg: "bg-amber-500/10", border: "border-amber-200", icon: AlertTriangle };
-    return { status: "No Match", color: "text-green-600", bg: "bg-green-500/10", border: "border-green-200", icon: CheckCircle };
-  };
-
-  const matchStatus = getMatchStatus();
-  const StatusIcon = matchStatus.icon;
+  const isProjectExists = currentScenario?.type === "exists";
+  const StatusIcon = isProjectExists ? XCircle : CheckCircle;
 
   return (
     <Card className="sticky top-24 bg-card border-border shadow-md">
@@ -183,94 +220,76 @@ export const AIAssistancePanel = () => {
             )}
 
             {/* Analysis Results */}
-            {analysisComplete && (
+            {analysisComplete && currentScenario && (
               <div className="space-y-4 animate-fade-in-up">
-                {/* Overall Match Status Card */}
-                <div className={`p-4 rounded-lg ${matchStatus.bg} border ${matchStatus.border}`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <StatusIcon className={`h-5 w-5 ${matchStatus.color}`} />
-                      <span className={`text-sm font-semibold ${matchStatus.color}`}>
-                        {matchStatus.status}
-                      </span>
-                    </div>
-                    <Badge className={`${matchStatus.bg} ${matchStatus.color} ${matchStatus.border}`} variant="outline">
-                      {overallMatchPercent >= 40 ? "MATCHED" : "NOT MATCHED"}
+                {/* Result Badge */}
+                <div className={`p-4 rounded-lg border ${isProjectExists ? 'bg-red-500/10 border-red-200' : 'bg-green-500/10 border-green-200'}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <StatusIcon className={`h-5 w-5 ${isProjectExists ? 'text-red-600' : 'text-green-600'}`} />
+                    <Badge 
+                      className={`${isProjectExists ? 'bg-red-500/10 text-red-600 border-red-200' : 'bg-green-500/10 text-green-600 border-green-200'}`} 
+                      variant="outline"
+                    >
+                      {currentScenario.badgeText}
                     </Badge>
                   </div>
-                  
-                  {/* Match Percentage Display */}
-                  <div className="text-center py-2">
-                    <div className={`text-4xl font-bold ${matchStatus.color}`}>
-                      {overallMatchPercent}%
+
+                  {/* Comparison Details */}
+                  <div className="space-y-2 mt-4">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Comparison Details</p>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className={`p-2 rounded text-center ${currentScenario.abstract === 'same' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                        <div className="font-medium">Abstract</div>
+                        <div className="capitalize">{currentScenario.abstract}</div>
+                      </div>
+                      <div className={`p-2 rounded text-center ${currentScenario.technology === 'same' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                        <div className="font-medium">Technology</div>
+                        <div className="capitalize">{currentScenario.technology}</div>
+                      </div>
+                      <div className={`p-2 rounded text-center ${currentScenario.title === 'same' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                        <div className="font-medium">Title</div>
+                        <div className="capitalize">{currentScenario.title}</div>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Overall Similarity Score
-                    </p>
                   </div>
 
-                  <Progress 
-                    value={overallMatchPercent} 
-                    className={`h-2 mt-2 ${overallMatchPercent >= 70 ? '[&>div]:bg-red-500' : overallMatchPercent >= 40 ? '[&>div]:bg-amber-500' : '[&>div]:bg-green-500'}`} 
-                  />
+                  {/* Matched Project Info (if exists) */}
+                  {currentScenario.matchedProject && (
+                    <div className="mt-4 p-3 rounded-lg bg-secondary/50">
+                      <p className="text-xs text-muted-foreground mb-1">
+                        {isProjectExists ? 'Existing Project:' : 'Similar Project Found:'}
+                      </p>
+                      <p className="text-sm font-medium text-foreground">
+                        {currentScenario.matchedProject}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                {/* Matched Projects List */}
-                {overallMatchPercent >= 40 && (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-amber-600" />
-                      <span className="text-sm font-medium text-foreground">
-                        Matched With Projects:
-                      </span>
-                    </div>
-
-                    <div className="space-y-2">
-                      {matchedProjects.map((project, index) => (
-                        <div
-                          key={project.name}
-                          className="group flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer animate-fade-in-up"
-                          style={{ animationDelay: `${index * 100}ms` }}
-                        >
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0 group-hover:text-accent transition-colors" />
-                            <span className="text-sm text-foreground truncate">
-                              {project.name}
-                            </span>
-                          </div>
-                          <Badge
-                            className={`ml-2 flex-shrink-0 ${
-                              project.match >= 90
-                                ? "bg-red-500/10 text-red-600 border-red-200"
-                                : project.match >= 80
-                                ? "bg-amber-500/10 text-amber-600 border-amber-200"
-                                : "bg-green-500/10 text-green-600 border-green-200"
-                            }`}
-                            variant="outline"
-                          >
-                            {project.match}%
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-
-                    <p className="text-xs text-muted-foreground text-center pt-2">
-                      Click on a project to view comparison details
-                    </p>
-                  </div>
-                )}
-
-                {/* No Match Message */}
-                {overallMatchPercent < 40 && (
-                  <div className="text-center py-2 animate-fade-in-up">
-                    <p className="text-sm font-medium text-green-600 mb-1">
-                      ✓ Your research appears to be original
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      No significant matches found in our database
-                    </p>
-                  </div>
-                )}
+                {/* Status Message */}
+                <div className="text-center py-2">
+                  {isProjectExists ? (
+                    <>
+                      <p className="text-sm font-medium text-red-600 mb-1">
+                        ✗ This project already exists in the database
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        All criteria (Abstract, Technology, Title) match an existing project
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium text-green-600 mb-1">
+                        ✓ Your project is unique
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {currentScenario.type === 'unique_different_tech' 
+                          ? 'Similar concept but different technology approach'
+                          : 'No matching project found in our database'}
+                      </p>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
