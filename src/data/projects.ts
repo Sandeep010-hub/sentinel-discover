@@ -6,6 +6,11 @@ export interface Project {
   branch: string;
   tags: string[];
   description: string;
+  abstract: string;
+  keywords: string[];
+  supervisor: string;
+  status: "Completed" | "In Progress" | "Under Review";
+  documentation?: string;
 }
 
 export const projects: Project[] = [
@@ -17,6 +22,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#IoT", "#ML", "#SmartCity"],
     description: "An intelligent traffic control system using IoT sensors and machine learning to optimize urban traffic flow.",
+    abstract: "This project presents a comprehensive smart traffic management system that leverages Internet of Things (IoT) sensors and machine learning algorithms to optimize urban traffic flow. The system collects real-time data from strategically placed sensors at intersections, processes this data using predictive models, and dynamically adjusts traffic signal timing. Our implementation achieved a 35% reduction in average wait times and a 28% improvement in overall traffic throughput during peak hours. The system also includes an emergency vehicle priority feature and integrates with existing city infrastructure.",
+    keywords: ["Traffic Optimization", "IoT Sensors", "Machine Learning", "Smart City", "Real-time Analytics"],
+    supervisor: "Dr. Rajesh Kumar",
+    status: "Completed",
   },
   {
     id: 2,
@@ -26,6 +35,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#NLP", "#Python", "#Analytics"],
     description: "Deep learning model for analyzing customer sentiment from product reviews with 94% accuracy.",
+    abstract: "This research develops a deep learning-based sentiment analysis system for e-commerce product reviews. Using a combination of LSTM networks and attention mechanisms, the model classifies reviews into positive, negative, and neutral categories with 94% accuracy. The system was trained on a dataset of over 500,000 reviews across multiple product categories. Key innovations include a domain-adaptive preprocessing pipeline and a novel approach to handling sarcasm and context-dependent expressions. The model is deployed as a REST API for real-time sentiment classification.",
+    keywords: ["Natural Language Processing", "Deep Learning", "LSTM", "Sentiment Classification", "E-commerce"],
+    supervisor: "Dr. Priya Sharma",
+    status: "Completed",
   },
   {
     id: 3,
@@ -35,6 +48,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#Blockchain", "#Security", "#DApp"],
     description: "A decentralized voting platform ensuring transparency and immutability using Ethereum smart contracts.",
+    abstract: "This project implements a secure, transparent, and tamper-proof electronic voting system using blockchain technology. Built on the Ethereum network, the system utilizes smart contracts to ensure vote integrity and prevent double voting. Features include voter identity verification using zero-knowledge proofs, end-to-end encryption, and a user-friendly web interface. The system has been tested with simulated elections involving up to 10,000 voters with an average transaction confirmation time of 15 seconds. The decentralized architecture eliminates single points of failure and provides complete audit trails.",
+    keywords: ["Blockchain", "Ethereum", "Smart Contracts", "Cryptography", "Decentralized Application"],
+    supervisor: "Dr. Amit Verma",
+    status: "Under Review",
   },
   {
     id: 4,
@@ -44,6 +61,10 @@ export const projects: Project[] = [
     branch: "Electronics",
     tags: ["#Robotics", "#ComputerVision", "#AI"],
     description: "Self-navigating drone system with obstacle avoidance using computer vision and path planning algorithms.",
+    abstract: "This project develops an autonomous navigation system for quadcopter drones using computer vision and advanced path planning algorithms. The system employs a stereo camera setup for depth perception and implements SLAM (Simultaneous Localization and Mapping) for real-time environment mapping. Obstacle detection is achieved through a combination of point cloud processing and neural network-based object recognition. The drone successfully navigated complex indoor environments with a 98.5% obstacle avoidance rate. The system includes fail-safe mechanisms and can operate in GPS-denied environments.",
+    keywords: ["Autonomous Systems", "Computer Vision", "SLAM", "Path Planning", "Quadcopter"],
+    supervisor: "Dr. Suresh Menon",
+    status: "Completed",
   },
   {
     id: 5,
@@ -53,6 +74,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#NLP", "#Healthcare", "#ChatBot"],
     description: "AI-powered medical assistant providing symptom analysis and preliminary diagnosis recommendations.",
+    abstract: "This project presents an intelligent healthcare chatbot system designed to provide preliminary medical assistance and symptom analysis. The system uses a fine-tuned large language model combined with a medical knowledge graph to understand patient symptoms and provide relevant health information. It includes features such as symptom severity assessment, medication reminders, and doctor appointment scheduling. The chatbot achieved 89% accuracy in symptom classification during clinical validation. Privacy is ensured through end-to-end encryption and compliance with healthcare data regulations.",
+    keywords: ["Healthcare AI", "Chatbot", "Natural Language Processing", "Medical Diagnosis", "Patient Care"],
+    supervisor: "Dr. Meera Patel",
+    status: "In Progress",
   },
   {
     id: 6,
@@ -62,6 +87,10 @@ export const projects: Project[] = [
     branch: "Electrical",
     tags: ["#ML", "#Renewable", "#TimeSeries"],
     description: "LSTM-based forecasting model for solar power generation with weather pattern integration.",
+    abstract: "This research develops an accurate solar power generation forecasting model using Long Short-Term Memory (LSTM) neural networks integrated with weather pattern data. The model processes historical solar irradiance data, temperature, cloud cover, and humidity to predict power output up to 48 hours in advance. Tested on data from three solar farms over two years, the model achieved a Mean Absolute Percentage Error (MAPE) of 4.2%. The predictions enable better grid management and energy storage optimization. The system includes a dashboard for real-time monitoring and prediction visualization.",
+    keywords: ["Solar Energy", "LSTM", "Time Series Forecasting", "Renewable Energy", "Grid Management"],
+    supervisor: "Dr. Vikram Singh",
+    status: "Completed",
   },
   {
     id: 7,
@@ -71,6 +100,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#Logistics", "#IoT", "#Automation"],
     description: "Automated inventory tracking and optimization system using RFID and robotic process automation.",
+    abstract: "This project implements a comprehensive smart warehouse management system combining RFID technology, IoT sensors, and robotic process automation. The system provides real-time inventory tracking, automated reordering, and optimized storage allocation using genetic algorithms. Integration with autonomous mobile robots (AMRs) enables automated picking and sorting operations. The implementation at a test facility resulted in 45% reduction in inventory errors, 30% improvement in picking efficiency, and 25% reduction in operational costs. The system includes predictive analytics for demand forecasting and seasonal inventory planning.",
+    keywords: ["Warehouse Automation", "RFID", "Inventory Management", "Robotics", "Supply Chain"],
+    supervisor: "Dr. Neha Gupta",
+    status: "Completed",
   },
   {
     id: 8,
@@ -80,6 +113,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#ML", "#FinTech", "#Security"],
     description: "Real-time transaction monitoring system using anomaly detection to prevent financial fraud.",
+    abstract: "This project develops a real-time fraud detection system for banking transactions using ensemble machine learning methods. The system combines isolation forests, autoencoders, and gradient boosting models to identify anomalous transaction patterns. Processing over 10,000 transactions per second, the system achieves a 99.2% true positive rate while maintaining a false positive rate below 0.5%. Features include adaptive learning from new fraud patterns, geographic anomaly detection, and behavioral biometric analysis. The system integrates with existing banking infrastructure through secure APIs and provides instant alerts for suspicious activities.",
+    keywords: ["Fraud Detection", "Anomaly Detection", "Banking Security", "Machine Learning", "Real-time Processing"],
+    supervisor: "Dr. Arun Krishnan",
+    status: "Under Review",
   },
   {
     id: 9,
@@ -89,6 +126,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#AR", "#Education", "#Mobile"],
     description: "Immersive augmented reality application for interactive STEM education and virtual labs.",
+    abstract: "This project creates an augmented reality-based educational platform focused on STEM subjects. The mobile application overlays 3D models, animations, and interactive simulations onto physical textbooks and learning materials. Features include virtual chemistry labs, physics simulations, and anatomical explorations. User studies with 200 students showed a 40% improvement in concept retention and 65% increase in engagement compared to traditional methods. The platform supports collaborative learning through shared AR experiences and includes progress tracking for educators. Compatible with both iOS and Android devices using ARKit and ARCore.",
+    keywords: ["Augmented Reality", "Educational Technology", "STEM Education", "Mobile Application", "Interactive Learning"],
+    supervisor: "Dr. Kavitha Rajan",
+    status: "Completed",
   },
   {
     id: 10,
@@ -98,6 +139,10 @@ export const projects: Project[] = [
     branch: "Electronics",
     tags: ["#IoT", "#Environment", "#Sensors"],
     description: "Remote water quality assessment system with real-time contamination alerts and data visualization.",
+    abstract: "This project develops an IoT-based water quality monitoring system for rivers and reservoirs. The system uses a network of solar-powered sensor nodes measuring pH, dissolved oxygen, turbidity, temperature, and specific contaminants. Data is transmitted via LoRaWAN to a central server where machine learning algorithms detect pollution events and predict water quality trends. The system provides real-time alerts to authorities when contamination levels exceed safe thresholds. Deployed across 15 monitoring stations, the system successfully detected 23 pollution incidents within the first year of operation. The dashboard provides public access to water quality data.",
+    keywords: ["Water Quality", "IoT Sensors", "Environmental Monitoring", "LoRaWAN", "Pollution Detection"],
+    supervisor: "Dr. Ramesh Iyer",
+    status: "Completed",
   },
   {
     id: 11,
@@ -107,6 +152,10 @@ export const projects: Project[] = [
     branch: "Computer Science",
     tags: ["#NLP", "#HR", "#Automation"],
     description: "Intelligent resume screening tool extracting skills, experience, and qualifications automatically.",
+    abstract: "This project implements an intelligent resume parsing and screening system using advanced NLP techniques. The system extracts structured information including personal details, education, work experience, skills, and certifications from resumes in various formats (PDF, DOCX, images). Using named entity recognition and transformer models, the system achieves 96% accuracy in field extraction. Features include skill matching against job requirements, candidate ranking, and bias detection in hiring. The system processes up to 1,000 resumes per hour and integrates with popular Applicant Tracking Systems (ATS) through REST APIs.",
+    keywords: ["Resume Parsing", "Natural Language Processing", "HR Technology", "Named Entity Recognition", "Recruitment Automation"],
+    supervisor: "Dr. Lakshmi Nair",
+    status: "In Progress",
   },
   {
     id: 12,
@@ -116,6 +165,10 @@ export const projects: Project[] = [
     branch: "Mechanical",
     tags: ["#ML", "#Industry4.0", "#IoT"],
     description: "Machine learning model predicting equipment failures before they occur to minimize downtime.",
+    abstract: "This project develops a predictive maintenance system for industrial machinery using machine learning and IoT sensors. The system monitors vibration patterns, temperature, acoustic emissions, and power consumption to predict equipment failures before they occur. Using a combination of convolutional neural networks for signal processing and survival analysis for failure prediction, the system achieves 92% accuracy in predicting failures up to 72 hours in advance. Implementation at a manufacturing facility reduced unplanned downtime by 60% and maintenance costs by 35%. The system includes a mobile app for maintenance crew notifications and work order management.",
+    keywords: ["Predictive Maintenance", "Industrial IoT", "Machine Learning", "Condition Monitoring", "Industry 4.0"],
+    supervisor: "Dr. Sanjay Deshmukh",
+    status: "Completed",
   },
 ];
 
